@@ -1,70 +1,32 @@
 {
     "Resources": {
 		"SourceSG": {
-		"Type": "AWS::EC2::SecurityGroup",
-		"Properties": {
+		"Type" : "AWS::EC2::SecurityGroup",
+		"Properties" : {
+			"GroupDescription" : "Allow http to client host",
 			"VpcId" : "vpc-3fb94654",
-			"GroupDescription": "Sample source security group"
-			}
-		},
-		"TargetSG": {
-		"Type": "AWS::EC2::SecurityGroup",
-		"Properties": {
-			"VpcId" : "vpc-3fb94654",
-			"GroupDescription": "Sample target security group"
-			}
-		},
-		"OutboundRule": {
-		"Type": "AWS::EC2::SecurityGroupEgress",
-		"Properties":{
-			"IpProtocol": "tcp",
-			"FromPort": 0,
-			"ToPort": 65535,
-			"DestinationSecurityGroupId": {
-			"Fn::GetAtt": [
-			"TargetSG",
-			"GroupId"
-			]
-				},
-		"GroupId": {
-        "Fn::GetAtt": [
-            "SourceSG",
-            "GroupId"
-				]
-				}
-			}
-		},
-		"InboundRule": {
-		"Type": "AWS::EC2::SecurityGroupIngress",
-		"Properties":{
-			"IpProtocol": "tcp",
-			"FromPort": 0,
-			"ToPort": 65535,
-			"SourceSecurityGroupId": {
-			 "Fn::GetAtt": [
-				"SourceSG",
-				"GroupId"
-				]
-				},
-		"GroupId": {
-        "Fn::GetAtt": [
-            "TargetSG",
-            "GroupId"
-				]
-				}
-			}
-		},
-
+			"SecurityGroupIngress" : [{
+				"IpProtocol" : "tcp",
+				"FromPort" : 80,
+				"ToPort" : 80,
+				"CidrIp" : "0.0.0.0/0"
+			}],
+			"SecurityGroupEgress" : [{
+				"IpProtocol" : "tcp",
+				"FromPort" : 80,
+				"ToPort" : 80,
+				"CidrIp" : "0.0.0.0/0"
+			}]
+		}
+	},
         "CreateInstance": {
             "Type": "AWS::EC2::Instance",
             "Properties": {
 				"AvailabilityZone" : "ap-south-1a",
 				"ImageId" : "ami-04893cdb768d0f9ee",
 				"InstanceType" : "t2.micro",
-				"KeyName" : "vishesh",
-				"SecurityGroupIds" : [
-						"SourceSG"
-					]
+				"SecurityGroupIds" : [ { "Ref" : "SourceSG" }],
+				"KeyName" : "vishesh"
 			}
         },
 		"CreateVolume": {
